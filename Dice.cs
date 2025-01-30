@@ -23,6 +23,8 @@ namespace LiarsDice
         private List<int> _rolledDice;
         private int _nDice;
 
+        public int Length => this._nDice;
+
         public DiceHand(int nDice) 
         {
             this._dice = new List<Dice>();
@@ -37,6 +39,12 @@ namespace LiarsDice
             {
                 this._dice.Add(new Dice());
             }
+        }
+
+        public void LoseDice() 
+        {
+            this._dice.RemoveAt(0);
+            this._nDice--;
         }
 
         public void RollAll()
