@@ -61,11 +61,9 @@ namespace LiarsDice
         public abstract short BidOrChallenge(Bid currentBid, int totalDice);
     }
 
-    public class HumanPlayer : Player 
+    public class HumanPlayer(string name) : Player(name, 6) 
     {
-        public HumanPlayer(string name) : base(name, 6) { }
-
-        private string[] playerOptions = { "Raise", "Call" };
+        private readonly string[] playerOptions = ["Raise", "Call"];
 
         private void ShowBidChallengeDisplay()
         {
@@ -79,7 +77,6 @@ namespace LiarsDice
                 int face = Program.UserSelectNumber("\n  Face to bid: ", 1, 6);
                 int quantity = Program.UserSelectNumber("  Quantity to bid: ", 1, totalDice);
                 int faceChange = face - currentBid.value;
-                int quantityChange = quantity - currentBid.quantity;
 
                 if (!initialBid && (faceChange < 1 && quantity < 1)) 
                 {
@@ -93,39 +90,35 @@ namespace LiarsDice
 
         public override short BidOrChallenge(Bid currentBid, int totalDice) 
         {
-            Menu menu = new Menu(playerOptions, ShowBidChallengeDisplay, null);
+            Menu menu = new(playerOptions, ShowBidChallengeDisplay, null);
             short result = (short)menu.ShowMenu();
             return result;
         }
     }
 
-    public class ComputerPlayer : Player
+    public class ComputerPlayer(string name, double risk = 0.5) : Player(name, 6)
     {
-        private double _risk;
+        private readonly double _risk = Math.Clamp(risk, 0.0, 1.0);
 
-        public ComputerPlayer(string name, double risk = 0.5) : base(name, 6) 
-        {
-            this._risk = Math.Clamp(risk, 0.0, 1.0);
-        }
-
-        static int nCr(int n, int r)
+        private static double NCr(int n, int r)
         {
             if (r > n) return 0;
-            if (r == 0 || n == r) return 1;
-            double res = 0;
-            for (int i = 0; i < r; i++)
+            if (r == 0 || r == n) return 1;
+            double res = 1;
+            for (int i = 1; i <= r; i++)
             {
-                res += Math.Log(n - i) - Math.Log(i + 1);
+                res *= (n - (r - i)) / (double)i;
             }
-            return (int)Math.Round(Math.Exp(res));
+            return res;
         }
 
-        private double DiceProb(int q, int n) 
+
+        private static double DiceProb(int q, int n) 
         {
             double totalProb = 0;
             for (int x = q; x <= n; x++) 
             {
-                totalProb += (nCr(n, x) * Math.Pow(1.0 / 6.0, x) * Math.Pow(5.0 / 6.0, n - x));
+                totalProb += (NCr(n, x) * Math.Pow(1.0 / 6.0, x) * Math.Pow(5.0 / 6.0, n - x));
             }
             return totalProb;
         }
@@ -143,9 +136,9 @@ namespace LiarsDice
             return count;
         }
 
-        private int EstimateDiceCount(int value, int remainingDice)
+        private static int EstimateDiceCount(int remainingDice)
         {
-            double probability = (value == 1) ? (1.0 / 6) : (1.0 / 3);
+            double probability = 1.0 / 6;
             return (int)Math.Round(probability * remainingDice);
         }
 
@@ -174,7 +167,7 @@ namespace LiarsDice
             }
 
             int knownCount = CountMatchingDice(currentBid.value);
-            int estimatedTotal = knownCount + EstimateDiceCount(currentBid.value, totalDice - this.dh.Length);
+            int estimatedTotal = knownCount + EstimateDiceCount(totalDice - this.dh.Length);
             double confidence = Math.Clamp((double)estimatedTotal / currentBid.quantity * (this._risk / 3), 0, 1);
 
             int newQuantity = currentBid.quantity + (int)Math.Round(1 + confidence);
@@ -190,7 +183,8 @@ namespace LiarsDice
 
         public override short BidOrChallenge(Bid currentBid, int totalDice)
         {
-            double prob = DiceProb(currentBid.quantity, totalDice - this.dh.Length);
+            int knownCount = CountMatchingDice(currentBid.value);
+            double prob = DiceProb(currentBid.quantity - knownCount, totalDice - this.dh.Length);
 
             double challengeThreshold = 0.25 + (0.3 * (1 - this._risk));
             if (prob < challengeThreshold)
