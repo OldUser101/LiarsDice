@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LiarsDice
+﻿namespace LiarsDice
 {
     public class Dice(int sides = 6)
     {
         private int _sides = sides;
         private Random _random = new Random();
 
-        public int Roll() 
+        public int Roll()
         {
             return (this._random.Next() % this._sides) + 1;
         }
@@ -25,7 +19,7 @@ namespace LiarsDice
 
         public int Length => this._nDice;
 
-        public DiceHand(int nDice) 
+        public DiceHand(int nDice)
         {
             this._dice = new List<Dice>();
             this._rolledDice = new List<int>();
@@ -33,15 +27,15 @@ namespace LiarsDice
             this.PopulateDice();
         }
 
-        private void PopulateDice() 
+        private void PopulateDice()
         {
-            for (int i = 0; i < this._nDice; i++) 
+            for (int i = 0; i < this._nDice; i++)
             {
                 this._dice.Add(new Dice());
             }
         }
 
-        public void LoseDice() 
+        public void LoseDice()
         {
             this._dice.RemoveAt(0);
             this._nDice--;
@@ -50,14 +44,14 @@ namespace LiarsDice
         public void RollAll()
         {
             List<int> results = new List<int>();
-            foreach (Dice d in this._dice) 
+            foreach (Dice d in this._dice)
             {
                 results.Add(d.Roll());
             }
             this._rolledDice = results;
         }
 
-        public List<int> GetResults() 
+        public List<int> GetResults()
         {
             return this._rolledDice;
         }

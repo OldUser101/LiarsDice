@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Security.Cryptography;
-
-namespace LiarsDice
+﻿namespace LiarsDice
 {
     class Program
     {
@@ -17,26 +13,26 @@ namespace LiarsDice
         public static bool isGameOver = false;
         public static int pSelTtlDispInt = 0;
 
-        public static int UserSelectNumber(string prompt, int min, int max) 
+        public static int UserSelectNumber(string prompt, int min, int max)
         {
-            while (true) 
+            while (true)
             {
                 Console.Write(prompt);
                 string value = Console.ReadLine() ?? String.Empty;
 
-                if (string.IsNullOrWhiteSpace(value)) 
+                if (string.IsNullOrWhiteSpace(value))
                 {
                     Console.WriteLine($"Invalid value! Must be between {min} and {max} inclusive.");
                     continue;
                 }
 
-                if (!int.TryParse(value, out int number)) 
+                if (!int.TryParse(value, out int number))
                 {
                     Console.WriteLine($"Invalid value! Must be between {min} and {max} inclusive.");
                     continue;
                 }
 
-                if (number < min || number > max) 
+                if (number < min || number > max)
                 {
                     Console.WriteLine($"Invalid value! Must be between {min} and {max} inclusive.");
                     continue;
@@ -46,7 +42,7 @@ namespace LiarsDice
             }
         }
 
-        public static void ShowTitle() 
+        public static void ShowTitle()
         {
             Console.Write("=== ");
             Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -56,13 +52,13 @@ namespace LiarsDice
             Console.WriteLine("  (c) Nathan Gill");
         }
 
-        public static void ShowBid(Bid bid) 
+        public static void ShowBid(Bid bid)
         {
             Console.WriteLine("Current Bid:");
             Console.WriteLine($"    {bid.quantity} {bidFaceNames[bid.value - 1]}{(bid.quantity > 1 ? 's' : ' ')}");
         }
 
-        public static void ShowBidChallengeDisplay(Player player, bool isInitial = false) 
+        public static void ShowBidChallengeDisplay(Player player, bool isInitial = false)
         {
             Console.Clear();
             ShowTitle();
@@ -86,14 +82,14 @@ namespace LiarsDice
             }
         }
 
-        public static void ShowPlayerSelectTitle() 
+        public static void ShowPlayerSelectTitle()
         {
             ShowTitle();
             Console.WriteLine();
             Console.WriteLine($"Player {pSelTtlDispInt + 1}");
         }
 
-        public static void ChoosePlayers() 
+        public static void ChoosePlayers()
         {
             if (players is null)
                 return;
@@ -109,7 +105,7 @@ namespace LiarsDice
                     continue;
                 }
 
-                if (N_PLAYERS > 12 || N_PLAYERS < 2) 
+                if (N_PLAYERS > 12 || N_PLAYERS < 2)
                 {
                     Console.WriteLine("Invalid number of players!");
                     continue;
@@ -131,7 +127,7 @@ namespace LiarsDice
                 switch (op)
                 {
                     case 0:
-                        while (true) 
+                        while (true)
                         {
                             Console.Write($"\nEnter name for player {pSelTtlDispInt + 1}: ");
                             string name = Console.ReadLine() ?? String.Empty;
@@ -172,13 +168,13 @@ namespace LiarsDice
 
             Console.WriteLine("\nOkay, here's who's playing:\n");
 
-            foreach (Player p in players) 
+            foreach (Player p in players)
             {
                 Console.WriteLine($"    {p.GetName()}");
             }
         }
 
-        static void ChooseInitialPlayer() 
+        static void ChooseInitialPlayer()
         {
             if (players is null)
                 return;
@@ -189,7 +185,7 @@ namespace LiarsDice
             Console.WriteLine($"\n{players[currentPlayer].GetName().ToUpper()} will make the first bid.");
         }
 
-        static void PrepPlayers() 
+        static void PrepPlayers()
         {
             if (players is null)
                 return;
@@ -211,21 +207,21 @@ namespace LiarsDice
             }
 
             players.Clear();
-            foreach (Player p in newPlayers) 
+            foreach (Player p in newPlayers)
             {
                 players.Add(p);
             }
         }
 
-        public static bool ValidateBid(Bid bid) 
+        public static bool ValidateBid(Bid bid)
         {
             if (players is null)
                 throw new Exception();
 
             int total = 0;
-            foreach (Player p in players) 
+            foreach (Player p in players)
             {
-                foreach(int i in p.GetResults()) 
+                foreach (int i in p.GetResults())
                 {
                     if (i == bid.value)
                         total++;
@@ -235,7 +231,7 @@ namespace LiarsDice
             return total >= bid.quantity;
         }
 
-        public static bool MakeChallenge(Bid currentBid) 
+        public static bool MakeChallenge(Bid currentBid)
         {
             if (players is null)
                 throw new Exception();
@@ -255,7 +251,7 @@ namespace LiarsDice
 
             Console.WriteLine("\nPlayer Hands:\n");
 
-            foreach (Player p in players) 
+            foreach (Player p in players)
             {
                 Console.Write($"  {p.GetName().ToUpper()}: ");
                 p.ShowHand();
@@ -280,7 +276,7 @@ namespace LiarsDice
 
             players = [];
 
-            if (players is null) 
+            if (players is null)
             {
                 return;
             }
@@ -292,7 +288,7 @@ namespace LiarsDice
             Console.Write("\nPress ANY KEY to begin...");
             Console.ReadKey();
 
-            while (!isGameOver) 
+            while (!isGameOver)
             {
                 Console.Clear();
                 ShowTitle();
@@ -328,31 +324,31 @@ namespace LiarsDice
 
                 bool roundInPlay = true;
 
-                while (roundInPlay) 
+                while (roundInPlay)
                 {
                     currentPlayer %= N_PLAYERS;
 
                     short move = players[currentPlayer].BidOrChallenge(currentBid, totalDice);
 
-                    switch (move) 
+                    switch (move)
                     {
                         case 0:             // BID
                             currentBid = players[currentPlayer].MakeBid(currentBid, totalDice, false);
                             break;
                         case 1:             // CHALLENGE
                             bool challengeSuccess = MakeChallenge(currentBid);
-                            if (!challengeSuccess) 
+                            if (!challengeSuccess)
                             {
                                 int lastPlayer = currentPlayer - 1;
 
-                                if (lastPlayer < 0) 
+                                if (lastPlayer < 0)
                                 {
                                     lastPlayer = N_PLAYERS - 1;
                                 }
 
                                 players[lastPlayer].LoseDice();
                             }
-                            else 
+                            else
                             {
                                 players[currentPlayer].LoseDice();
                             }

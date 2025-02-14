@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LiarsDice
+﻿namespace LiarsDice
 {
     public abstract class Player
     {
         protected string playerName;
         protected DiceHand dh;
 
-        public Player(string name, int nDice) 
+        public Player(string name, int nDice)
         {
             this.dh = new DiceHand(nDice);
             this.playerName = name;
@@ -32,24 +26,24 @@ namespace LiarsDice
             return dh.GetResults();
         }
 
-        public string GetName() 
+        public string GetName()
         {
             return this.playerName;
         }
 
-        public void LoseDice() 
+        public void LoseDice()
         {
             dh.LoseDice();
         }
 
-        public void RollDice() 
+        public void RollDice()
         {
             dh.RollAll();
         }
 
-        public bool IsOut() 
+        public bool IsOut()
         {
-            if (dh.Length <= 0) 
+            if (dh.Length <= 0)
             {
                 return true;
             }
@@ -61,7 +55,7 @@ namespace LiarsDice
         public abstract short BidOrChallenge(Bid currentBid, int totalDice);
     }
 
-    public class HumanPlayer(string name) : Player(name, 6) 
+    public class HumanPlayer(string name) : Player(name, 6)
     {
         private readonly string[] playerOptions = ["Raise", "Call"];
 
@@ -70,7 +64,7 @@ namespace LiarsDice
             Program.ShowBidChallengeDisplay(this);
         }
 
-        public override Bid MakeBid(Bid currentBid, int totalDice, bool initialBid) 
+        public override Bid MakeBid(Bid currentBid, int totalDice, bool initialBid)
         {
             while (true)
             {
@@ -87,7 +81,7 @@ namespace LiarsDice
                 }
 
                 // If the face stays the same, the quantity must rise.
-                if (!initialBid && faceChange == 0 && quantityChange < 1) 
+                if (!initialBid && faceChange == 0 && quantityChange < 1)
                 {
                     Console.WriteLine("  New bid must have a greater face or quantity that the previous bid!");
                     continue;
@@ -99,7 +93,7 @@ namespace LiarsDice
             }
         }
 
-        public override short BidOrChallenge(Bid currentBid, int totalDice) 
+        public override short BidOrChallenge(Bid currentBid, int totalDice)
         {
             Menu menu = new(playerOptions, ShowBidChallengeDisplay, null);
             short result = (short)menu.ShowMenu();
@@ -124,10 +118,10 @@ namespace LiarsDice
         }
 
 
-        private static double DiceProb(int q, int n) 
+        private static double DiceProb(int q, int n)
         {
             double totalProb = 0;
-            for (int x = q; x <= n; x++) 
+            for (int x = q; x <= n; x++)
             {
                 totalProb += (NCr(n, x) * Math.Pow(1.0 / 6.0, x) * Math.Pow(5.0 / 6.0, n - x));
             }
@@ -138,7 +132,7 @@ namespace LiarsDice
         {
             int count = 0;
 
-            foreach (int d in this.dh.GetResults()) 
+            foreach (int d in this.dh.GetResults())
             {
                 if (d == value)
                     count++;
@@ -158,7 +152,7 @@ namespace LiarsDice
             int bestValue = 0;
             int bestQuantity = 0;
 
-            for (int i = 1; i < 7; i++) 
+            for (int i = 1; i < 7; i++)
             {
                 if (CountMatchingDice(i) > bestQuantity)
                 {

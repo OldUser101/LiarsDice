@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LiarsDice
+﻿namespace LiarsDice
 {
     public class Menu(IEnumerable<string>? options, Action? initialAction, Action? finalAction)
     {
@@ -12,12 +6,12 @@ namespace LiarsDice
         private Action? initialAction = initialAction;
         private Action? finalAction = finalAction;
 
-        public void SetOptions(IEnumerable<string>? options) 
+        public void SetOptions(IEnumerable<string>? options)
         {
             this.items = options;
         }
 
-        public void SetInitialAction(Action? initialAction) 
+        public void SetInitialAction(Action? initialAction)
         {
             this.initialAction = initialAction;
         }
@@ -27,30 +21,30 @@ namespace LiarsDice
             this.finalAction = finalAction;
         }
 
-        private void DisplayMenu(int cursorPos) 
+        private void DisplayMenu(int cursorPos)
         {
             if (this.items is null)
             {
                 return;
             }
 
-            for (int i = 0; i < this.items.Count(); i++) 
+            for (int i = 0; i < this.items.Count(); i++)
             {
                 Console.WriteLine($"{(i == cursorPos ? '>' : ' ')} {this.items.ElementAt(i)}");
             }
         }
 
-        public int ShowMenu() 
+        public int ShowMenu()
         {
             int selectedItem = 0;
             bool exit = false;
             bool cancel = false;
 
-            if (this.items is not null && this.items.Any()) 
+            if (this.items is not null && this.items.Any())
             {
                 Console.CursorVisible = false;
 
-                while (!exit && !cancel) 
+                while (!exit && !cancel)
                 {
                     Console.Clear();
 
@@ -62,7 +56,7 @@ namespace LiarsDice
                     DisplayMenu(selectedItem);
                     ConsoleKeyInfo key = Console.ReadKey(intercept: true);
 
-                    switch (key.Key) 
+                    switch (key.Key)
                     {
                         case ConsoleKey.Escape:
                             cancel = true;
@@ -79,7 +73,7 @@ namespace LiarsDice
                             break;
                         case ConsoleKey.DownArrow:
                             selectedItem++;
-                            if (selectedItem >= this.items.Count()) 
+                            if (selectedItem >= this.items.Count())
                             {
                                 selectedItem = 0;
                             }
@@ -95,7 +89,7 @@ namespace LiarsDice
                 this.finalAction();
             }
 
-            if (exit && !cancel) 
+            if (exit && !cancel)
             {
                 return selectedItem;
             }
