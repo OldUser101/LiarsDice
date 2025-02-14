@@ -77,12 +77,23 @@ namespace LiarsDice
                 int face = Program.UserSelectNumber("\n  Face to bid: ", 1, 6);
                 int quantity = Program.UserSelectNumber("  Quantity to bid: ", 1, totalDice);
                 int faceChange = face - currentBid.value;
+                int quantityChange = quantity - currentBid.quantity;
 
-                if (!initialBid && (faceChange < 1 && quantity < 1)) 
+                // If the face decreases, the bid is guaranteed to be invalid.
+                if (!initialBid && faceChange < 0)
                 {
                     Console.WriteLine("  New bid must have a greater face or quantity that the previous bid!");
                     continue;
                 }
+
+                // If the face stays the same, the quantity must rise.
+                if (!initialBid && faceChange == 0 && quantityChange < 1) 
+                {
+                    Console.WriteLine("  New bid must have a greater face or quantity that the previous bid!");
+                    continue;
+                }
+
+                // Otherwise, if the face rises, the quantity can be anything.
 
                 return new Bid(quantity, face);
             }
