@@ -6,18 +6,11 @@ using System.Threading.Tasks;
 
 namespace LiarsDice
 {
-    public class Menu
+    public class Menu(IEnumerable<string>? options, Action? initialAction, Action? finalAction)
     {
-        private IEnumerable<string>? items;
-        private Action? initialAction;
-        private Action? finalAction;
-
-        public Menu(IEnumerable<string>? options, Action? initialAction, Action? finalAction) 
-        {
-            this.items = options;
-            this.initialAction = initialAction;
-            this.finalAction = finalAction;
-        }
+        private IEnumerable<string>? items = options;
+        private Action? initialAction = initialAction;
+        private Action? finalAction = finalAction;
 
         public void SetOptions(IEnumerable<string>? options) 
         {
@@ -53,7 +46,7 @@ namespace LiarsDice
             bool exit = false;
             bool cancel = false;
 
-            if (this.items is not null && this.items.Count() > 0) 
+            if (this.items is not null && this.items.Any()) 
             {
                 Console.CursorVisible = false;
 
